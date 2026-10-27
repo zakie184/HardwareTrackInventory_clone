@@ -35,19 +35,16 @@ Public Class DashboardControl
         ResizeActivityColumns()
     End Sub
 
-    ' Responsive Pie Chart
     Private Sub picPieChart_SizeChanged(sender As Object, e As EventArgs) Handles picPieChart.SizeChanged
         DrawFuturisticChart()
     End Sub
 
-    ' Responsive ListView Columns
     Private Sub lvActivity_SizeChanged(sender As Object, e As EventArgs) Handles lvActivity.SizeChanged
         ResizeActivityColumns()
     End Sub
 
     Private Sub ResizeActivityColumns()
         If lvActivity.Columns.Count = 3 AndAlso lvActivity.Width > 50 Then
-            ' I-set ang fixed widths para sa Time at User, tapos yung natitira ay mapupunta sa Action
             lvActivity.Columns(0).Width = 55 ' Time
             lvActivity.Columns(1).Width = 70 ' User
             lvActivity.Columns(2).Width = lvActivity.Width - 135 ' Action (fill remaining)
@@ -80,14 +77,15 @@ Public Class DashboardControl
                 g.DrawEllipse(New Pen(Color.LightGray, 10), emptyRect)
                 g.DrawString("No Data", New Font("Segoe UI", 14, FontStyle.Bold), Brushes.Gray, centerX - 40, centerY - 10)
             Else
+                ' ONE COLOR PALETTE (Shades of Blue)
                 Dim colors As Color() = {
-                    Color.FromArgb(26, 54, 126),   ' Blue
-                    Color.FromArgb(245, 176, 65),  ' Yellow
-                    Color.FromArgb(46, 204, 113),  ' Green
-                    Color.FromArgb(155, 89, 182),  ' Purple
-                    Color.FromArgb(231, 76, 60),   ' Red
-                    Color.FromArgb(52, 152, 219),  ' Light Blue
-                    Color.FromArgb(230, 126, 34)   ' Orange
+                    Color.FromArgb(15, 35, 75),    ' Darkest Navy
+                    Color.FromArgb(26, 54, 126),   ' Deep Blue (Primary)
+                    Color.FromArgb(45, 85, 160),   ' Medium Blue
+                    Color.FromArgb(80, 120, 200),  ' Lighter Blue
+                    Color.FromArgb(120, 160, 220), ' Soft Blue
+                    Color.FromArgb(160, 190, 240), ' Very Light Blue
+                    Color.FromArgb(200, 220, 250)  ' Almost White Blue
                 }
 
                 Dim startAngle As Single = -90
@@ -98,10 +96,11 @@ Public Class DashboardControl
                     Dim sweepAngle As Single = CSng(catTotal / grandTotal * 360)
 
                     Dim col As Color = colors(colorIndex Mod colors.Length)
+                    ' Gumawa ng mas dark na version para sa gradient
                     Dim colDark As Color = Color.FromArgb(
-                        Math.Max(0, col.R - 40),
-                        Math.Max(0, col.G - 40),
-                        Math.Max(0, col.B - 40)
+                        Math.Max(0, col.R - 30),
+                        Math.Max(0, col.G - 30),
+                        Math.Max(0, col.B - 30)
                     )
 
                     DrawArcSlice(g, centerX, centerY, outerRadius, innerRadius, startAngle, sweepAngle, col, colDark)

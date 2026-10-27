@@ -37,7 +37,7 @@ Partial Class MainForm
         Me.pnlFooter.SuspendLayout()
         Me.SuspendLayout()
 
-        Me.pnlHeader.BackColor = System.Drawing.Color.FromArgb(26, 54, 126)
+        Me.pnlHeader.BackColor = System.Drawing.Color.FromArgb(26, 54, 75) ' BAGONG KULAY
         Me.pnlHeader.Controls.Add(Me.lblHeaderTitle)
         Me.pnlHeader.Controls.Add(Me.lblHeaderSub)
         Me.pnlHeader.Controls.Add(Me.btnNotifications)
@@ -58,7 +58,6 @@ Partial Class MainForm
         Me.lblHeaderSub.ForeColor = System.Drawing.Color.FromArgb(149, 165, 166)
         Me.lblHeaderSub.Location = New System.Drawing.Point(22, 33)
 
-        ' btnNotifications
         Me.btnNotifications.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnNotifications.BackColor = System.Drawing.Color.Transparent
         Me.btnNotifications.FlatAppearance.BorderSize = 0
@@ -83,7 +82,7 @@ Partial Class MainForm
         Me.btnHeaderLogout.FlatAppearance.BorderSize = 0
         Me.btnHeaderLogout.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnHeaderLogout.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.btnHeaderLogout.ForeColor = System.Drawing.Color.FromArgb(26, 54, 126)
+        Me.btnHeaderLogout.ForeColor = System.Drawing.Color.FromArgb(26, 54, 75) ' BAGONG KULAY
         Me.btnHeaderLogout.Location = New System.Drawing.Point(1030, 10)
         Me.btnHeaderLogout.Size = New System.Drawing.Size(55, 35)
         Me.btnHeaderLogout.Text = "🚪"
@@ -102,7 +101,7 @@ Partial Class MainForm
         Me.splitContainer.SplitterDistance = 220
         Me.splitContainer.SplitterWidth = 1
 
-        Me.pnlSidebar.BackColor = System.Drawing.Color.FromArgb(26, 54, 126)
+        Me.pnlSidebar.BackColor = System.Drawing.Color.FromArgb(26, 54, 75) ' BAGONG KULAY
         Me.pnlSidebar.Controls.Add(Me.tlpSidebar)
         Me.pnlSidebar.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlSidebar.Padding = New System.Windows.Forms.Padding(6)
@@ -127,7 +126,7 @@ Partial Class MainForm
         Me.btnDashboard.FlatAppearance.BorderSize = 0
         Me.btnDashboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnDashboard.Font = New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)
-        Me.btnDashboard.ForeColor = System.Drawing.Color.FromArgb(26, 54, 126)
+        Me.btnDashboard.ForeColor = System.Drawing.Color.FromArgb(26, 54, 75) ' BAGONG KULAY
         Me.btnDashboard.Text = "📊  Dashboard"
         Me.btnDashboard.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnDashboard.UseVisualStyleBackColor = False
@@ -163,7 +162,7 @@ Partial Class MainForm
         Me.pnlContent.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlContent.Padding = New System.Windows.Forms.Padding(15)
 
-        Me.pnlFooter.BackColor = System.Drawing.Color.FromArgb(26, 54, 126)
+        Me.pnlFooter.BackColor = System.Drawing.Color.FromArgb(26, 54, 75) ' BAGONG KULAY
         Me.pnlFooter.Controls.Add(Me.lblFooterLeft)
         Me.pnlFooter.Controls.Add(Me.lblFooterRight)
         Me.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom
@@ -182,7 +181,6 @@ Partial Class MainForm
         Me.lblFooterRight.Location = New System.Drawing.Point(890, 14)
         Me.lblFooterRight.Text = "Logged in as: John Doe | Role: Admin"
 
-        ' tmrNotifications
         Me.tmrNotifications.Enabled = True
         Me.tmrNotifications.Interval = 5000
 

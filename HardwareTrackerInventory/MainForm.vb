@@ -30,7 +30,6 @@
         LoadPage(dashboardPage)
         HighlightButton(btnDashboard)
 
-        ' Simulan ang timer
         tmrNotifications.Start()
         CheckNotifications()
     End Sub
@@ -72,7 +71,7 @@
             b.ForeColor = Color.White
         Next
         activeBtn.BackColor = Color.FromArgb(245, 176, 65)
-        activeBtn.ForeColor = Color.FromArgb(26, 54, 126)
+        activeBtn.ForeColor = Color.FromArgb(26, 54, 75) ' BAGONG KULAY
     End Sub
 
     ' NOTIFICATION LOGIC
@@ -97,7 +96,6 @@
     Private Sub btnNotifications_Click(sender As Object, e As EventArgs) Handles btnNotifications.Click
         Using frm As New NotificationForm(currentUser)
             frm.ShowDialog(Me)
-            ' Pagka-close, i-refresh ang count
             CheckNotifications()
         End Using
     End Sub
