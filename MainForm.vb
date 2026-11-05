@@ -2,6 +2,7 @@
     Private currentUser As User = Nothing
     Private dashboardPage As DashboardControl = Nothing
     Private hardwarePage As HardwareControl = Nothing
+    Private categoryPage As CategoryControl = Nothing
     Private usersPage As UserManagementControl = Nothing
 
     Public Sub New()
@@ -20,12 +21,17 @@
         hardwarePage = New HardwareControl()
         hardwarePage.SetCurrentUser(currentUser)
 
+        categoryPage = New CategoryControl()
+        categoryPage.SetCurrentUser(currentUser)
+
         If currentUser.CanManageUsers() Then
             usersPage = New UserManagementControl()
             usersPage.SetCurrentUser(currentUser)
         End If
 
         btnUsers.Visible = currentUser.CanManageUsers()
+        ' Only Admin and Manager can see Categories tab
+        btnCategories.Visible = currentUser.CanManageMasterList()
 
         LoadPage(dashboardPage)
         HighlightButton(btnDashboard)
@@ -41,6 +47,8 @@
 
         If TypeOf page Is DashboardControl Then
             DirectCast(page, DashboardControl).LoadDashboard()
+        ElseIf TypeOf page Is CategoryControl Then
+            DirectCast(page, CategoryControl).LoadCategories()
         End If
     End Sub
 
@@ -52,6 +60,13 @@
     Private Sub btnHardware_Click(sender As Object, e As EventArgs) Handles btnHardware.Click
         LoadPage(hardwarePage)
         HighlightButton(btnHardware)
+    End Sub
+
+    Private Sub btnCategories_Click(sender As Object, e As EventArgs) Handles btnCategories.Click
+        If currentUser.CanManageMasterList() Then
+            LoadPage(categoryPage)
+            HighlightButton(btnCategories)
+        End If
     End Sub
 
     Private Sub btnUsers_Click(sender As Object, e As EventArgs) Handles btnUsers.Click
@@ -66,16 +81,15 @@
             tmrNotifications.Stop()
             DatabaseHelper.LogActivity(currentUser.Username, currentUser.Role, "Logged out")
 
-            ' FIX: Clean approach to restart the login flow
             Me.Hide()
             Dim login As New LoginForm()
             login.Show()
-            Me.Close() ' Properly disposes the MainForm to free memory
+            Me.Close()
         End If
     End Sub
 
     Private Sub HighlightButton(activeBtn As Button)
-        Dim btns As Button() = {btnDashboard, btnHardware, btnUsers}
+        Dim btns As Button() = {btnDashboard, btnHardware, btnCategories, btnUsers}
         For Each b In btns
             b.BackColor = Color.Transparent
             b.ForeColor = Color.White
@@ -84,16 +98,13 @@
         activeBtn.ForeColor = Color.FromArgb(26, 54, 75)
     End Sub
 
-    ' NOTIFICATION LOGIC
     Private Sub tmrNotifications_Tick(sender As Object, e As EventArgs) Handles tmrNotifications.Tick
         CheckNotifications()
     End Sub
 
     Private Sub CheckNotifications()
         If currentUser Is Nothing Then Return
-
         Dim unread As Integer = DatabaseHelper.GetUnreadNotificationCount(currentUser.Username)
-
         If unread > 0 Then
             btnNotifications.Text = "🔔 (" & unread & ")"
             btnNotifications.ForeColor = Color.FromArgb(245, 176, 65)

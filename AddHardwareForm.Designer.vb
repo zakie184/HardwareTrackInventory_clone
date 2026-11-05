@@ -11,8 +11,6 @@ Partial Class AddHardwareForm
         Me.txtName = New System.Windows.Forms.TextBox()
         Me.lblCategory = New System.Windows.Forms.Label()
         Me.cmbCategory = New System.Windows.Forms.ComboBox()
-        Me.lblBranch = New System.Windows.Forms.Label()
-        Me.cmbBranch = New System.Windows.Forms.ComboBox()
         Me.lblQty = New System.Windows.Forms.Label()
         Me.numQty = New System.Windows.Forms.NumericUpDown()
         Me.btnSave = New System.Windows.Forms.Button()
@@ -48,45 +46,35 @@ Partial Class AddHardwareForm
         Me.cmbCategory.Location = New System.Drawing.Point(20, 150)
         Me.cmbCategory.Size = New System.Drawing.Size(380, 23)
 
-        Me.lblBranch.AutoSize = True
-        Me.lblBranch.Location = New System.Drawing.Point(20, 190)
-        Me.lblBranch.Text = "Branch"
-
-        Me.cmbBranch.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cmbBranch.Location = New System.Drawing.Point(20, 210)
-        Me.cmbBranch.Size = New System.Drawing.Size(230, 23)
-
         Me.lblQty.AutoSize = True
-        Me.lblQty.Location = New System.Drawing.Point(270, 190)
+        Me.lblQty.Location = New System.Drawing.Point(20, 190)
         Me.lblQty.Text = "Initial Quantity"
 
-        Me.numQty.Location = New System.Drawing.Point(270, 210)
+        Me.numQty.Location = New System.Drawing.Point(20, 210)
         Me.numQty.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
-        Me.numQty.Size = New System.Drawing.Size(130, 23)
+        Me.numQty.Size = New System.Drawing.Size(380, 23)
 
         Me.btnSave.BackColor = System.Drawing.Color.FromArgb(245, 176, 65)
         Me.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnSave.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnSave.ForeColor = System.Drawing.Color.FromArgb(26, 54, 75)
-        Me.btnSave.Location = New System.Drawing.Point(160, 270)
+        Me.btnSave.Location = New System.Drawing.Point(160, 260)
         Me.btnSave.Size = New System.Drawing.Size(110, 35)
         Me.btnSave.Text = "Save Item"
         Me.btnSave.UseVisualStyleBackColor = False
 
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnCancel.Location = New System.Drawing.Point(290, 270)
+        Me.btnCancel.Location = New System.Drawing.Point(290, 260)
         Me.btnCancel.Size = New System.Drawing.Size(110, 35)
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
 
-        Me.ClientSize = New System.Drawing.Size(420, 330)
+        Me.ClientSize = New System.Drawing.Size(420, 320)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.numQty)
         Me.Controls.Add(Me.lblQty)
-        Me.Controls.Add(Me.cmbBranch)
-        Me.Controls.Add(Me.lblBranch)
         Me.Controls.Add(Me.cmbCategory)
         Me.Controls.Add(Me.lblCategory)
         Me.Controls.Add(Me.txtName)
@@ -107,8 +95,6 @@ Partial Class AddHardwareForm
     Friend WithEvents txtName As System.Windows.Forms.TextBox
     Friend WithEvents lblCategory As System.Windows.Forms.Label
     Friend WithEvents cmbCategory As System.Windows.Forms.ComboBox
-    Friend WithEvents lblBranch As System.Windows.Forms.Label
-    Friend WithEvents cmbBranch As System.Windows.Forms.ComboBox
     Friend WithEvents lblQty As System.Windows.Forms.Label
     Friend WithEvents numQty As System.Windows.Forms.NumericUpDown
     Friend WithEvents btnSave As System.Windows.Forms.Button

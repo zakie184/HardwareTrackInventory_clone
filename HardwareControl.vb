@@ -14,6 +14,7 @@ Public Class HardwareControl
 
     Protected Overrides Sub OnVisibleChanged(e As EventArgs)
         MyBase.OnVisibleChanged(e)
+        ' Auto-refresh when the user navigates back to this tab
         If Me.Visible AndAlso currentUser IsNot Nothing Then
             LoadHardware()
         End If
@@ -26,13 +27,25 @@ Public Class HardwareControl
         btnRestock.Visible = currentUser.CanReceive()
         btnIssue.Visible = currentUser.CanIssue()
         btnRequestReturn.Visible = currentUser.CanIssue()
-        btnApprovals.Visible = currentUser.CanApprove()
+
+        ' Manager can now access Approvals for Issuances
+        btnApprovals.Visible = currentUser.CanApproveReceivingsAndReturns() OrElse currentUser.CanApproveIssuances()
+
         btnDelete.Visible = currentUser.CanToggleStatus()
     End Sub
 
     Public Sub LoadHardware()
         Try
-            dgvHardware.DataSource = DatabaseHelper.GetAllHardware()
+            ' Handle the search bar placeholder text
+            Dim searchQuery As String = txtSearch.Text.Trim()
+            If searchQuery = "Search item or category..." Then
+                searchQuery = ""
+            End If
+
+            ' Fetch from Database using the new Search parameter
+            dgvHardware.DataSource = DatabaseHelper.GetAllHardware(searchQuery)
+
+            ' Format Columns
             If dgvHardware.Columns.Contains("HardwareID") Then dgvHardware.Columns("HardwareID").Visible = False
             If dgvHardware.Columns.Contains("Name") Then dgvHardware.Columns("Name").HeaderText = "Item Name"
             If dgvHardware.Columns.Contains("StockIn") Then dgvHardware.Columns("StockIn").HeaderText = "Total In"
@@ -43,6 +56,7 @@ Public Class HardwareControl
             ClearDetails()
             lblCount.Text = dgvHardware.RowCount & " records found"
         Catch ex As Exception
+            ' Silent catch to prevent UI crash
         End Try
     End Sub
 
@@ -68,13 +82,41 @@ Public Class HardwareControl
             lblQty.Text = "Qty: " & stock.ToString()
             lblStatus.Text = "Status: " & status
 
-            If status = "Active" Then lblStatus.ForeColor = Color.Green Else lblStatus.ForeColor = Color.Gray
+            If status = "Active" Then
+                lblStatus.ForeColor = Color.Green
+            Else
+                lblStatus.ForeColor = Color.Gray
+            End If
 
             btnIssue.Enabled = currentUser.CanIssue() AndAlso stock > 0 AndAlso status = "Active"
             btnDelete.Enabled = currentUser.CanToggleStatus()
         End If
     End Sub
 
+    ' ==========================================
+    ' SEARCH BAR EVENTS (Placeholder logic)
+    ' ==========================================
+    Private Sub txtSearch_TextChanged(sender As Object, e As EventArgs) Handles txtSearch.TextChanged
+        LoadHardware()
+    End Sub
+
+    Private Sub txtSearch_Enter(sender As Object, e As EventArgs) Handles txtSearch.Enter
+        If txtSearch.Text = "Search item or category..." Then
+            txtSearch.Text = ""
+            txtSearch.ForeColor = Color.Black
+        End If
+    End Sub
+
+    Private Sub txtSearch_Leave(sender As Object, e As EventArgs) Handles txtSearch.Leave
+        If String.IsNullOrWhiteSpace(txtSearch.Text) Then
+            txtSearch.Text = "Search item or category..."
+            txtSearch.ForeColor = Color.Gray
+        End If
+    End Sub
+
+    ' ==========================================
+    ' BUTTON EVENTS
+    ' ==========================================
     Private Sub btnMasterList_Click(sender As Object, e As EventArgs) Handles btnMasterList.Click
         Using frm As New AddHardwareForm(currentUser)
             If frm.ShowDialog(Me) = DialogResult.OK Then LoadHardware()
@@ -95,10 +137,12 @@ Public Class HardwareControl
 
     Private Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
         If selectedID = -1 Then Return
-        If MessageBox.Show("Toggle status (Active/Inactive)?", "Status Change", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+        If MessageBox.Show("Are you sure you want to toggle the status of this item (Active/Inactive)?", "Status Change", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Dim currentStatus As String = lblStatus.Text.Replace("Status: ", "")
             Dim newStatus As String = If(currentStatus = "Active", "Inactive", "Active")
-            If DatabaseHelper.SetHardwareStatus(selectedID, newStatus) Then LoadHardware()
+            If DatabaseHelper.SetHardwareStatus(selectedID, newStatus) Then
+                LoadHardware()
+            End If
         End If
     End Sub
 

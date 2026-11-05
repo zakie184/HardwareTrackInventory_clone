@@ -9,7 +9,8 @@ Public Class DashboardControl
     Public Sub SetCurrentUser(user As User)
         currentUser = user
         lblWelcome.Text = "👋 Welcome back, " & user.FullName & "!"
-        lblDate.Text = "Branch: " & user.BranchDisplay & " | Role: " & user.RoleDisplay
+        ' Fixed: Replaced user.BranchDisplay with static text
+        lblDate.Text = "Main Branch | Role: " & user.RoleDisplay
         LoadDashboard()
     End Sub
 
@@ -78,7 +79,6 @@ Public Class DashboardControl
                 g.DrawEllipse(New Pen(Color.LightGray, 10), emptyRect)
                 g.DrawString("No Data", New Font("Segoe UI", 14, FontStyle.Bold), Brushes.Gray, centerX - 40, centerY - 10)
             Else
-                ' MONOCHROMATIC BLUE PALETTE
                 Dim colors As Color() = {
                     Color.FromArgb(15, 35, 75),
                     Color.FromArgb(26, 54, 126),
@@ -116,7 +116,6 @@ Public Class DashboardControl
                 Dim subTextSize As SizeF = g.MeasureString("Items", subTextFont)
                 g.DrawString("Items", subTextFont, Brushes.Gray, centerX - (subTextSize.Width / 2), centerY + (textSize.Height / 2) + 2)
 
-                ' Dynamic Legend
                 Dim legendY As Integer = centerY + outerRadius + 20
                 Dim legendStartX As Integer = 10
                 colorIndex = 0

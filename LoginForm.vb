@@ -26,13 +26,15 @@ Public Class LoginForm
 
         Dim dt As DataTable = DatabaseHelper.GetUser(txtUsername.Text.Trim())
         If dt.Rows.Count = 0 Then
-            MessageBox.Show("Username not found.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
         Dim row As DataRow = dt.Rows(0)
-        If row("PasswordHash").ToString() <> txtPassword.Text Then
-            MessageBox.Show("Invalid password.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        Dim inputHash As String = SecurityHelper.HashPassword(txtPassword.Text.Trim())
+
+        If row("PasswordHash").ToString() <> inputHash Then
+            MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
@@ -47,9 +49,7 @@ Public Class LoginForm
         CurrentUser.FullName = row("FullName").ToString()
         CurrentUser.Role = row("Role").ToString()
         CurrentUser.Status = row("Status").ToString()
-
-        If row("BranchID") IsNot DBNull.Value Then CurrentUser.BranchID = Convert.ToInt32(row("BranchID"))
-        If row("BranchName") IsNot DBNull.Value Then CurrentUser.BranchName = row("BranchName").ToString()
+        ' Branch removed
 
         DatabaseHelper.UpdateLastLogin(CurrentUser.Username)
         DatabaseHelper.LogActivity(CurrentUser.Username, CurrentUser.Role, "Logged in")

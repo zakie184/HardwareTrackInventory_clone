@@ -14,13 +14,10 @@
             Return
         End If
 
+        ' Removed GetAllBranches
         cmbRole.DataSource = DatabaseHelper.GetAllRoles()
         cmbRole.DisplayMember = "RoleName"
         cmbRole.ValueMember = "RoleID"
-
-        cmbBranch.DataSource = DatabaseHelper.GetAllBranches()
-        cmbBranch.DisplayMember = "Name"
-        cmbBranch.ValueMember = "BranchID"
     End Sub
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
@@ -29,8 +26,8 @@
             Return
         End If
 
-        If cmbRole.SelectedIndex < 0 OrElse cmbBranch.SelectedIndex < 0 Then
-            MessageBox.Show("Please select a Role and Branch.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        If cmbRole.SelectedIndex < 0 Then
+            MessageBox.Show("Please select a Role.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
@@ -38,9 +35,9 @@
         Dim pw As String = txtPassword.Text.Trim()
         Dim fn As String = txtFullName.Text.Trim()
         Dim rid As Integer = Convert.ToInt32(cmbRole.SelectedValue)
-        Dim bid As Integer = Convert.ToInt32(cmbBranch.SelectedValue)
 
-        If DatabaseHelper.AddUser(un, pw, fn, rid, bid) Then
+        ' Fixed: Removed the 5th argument (BranchID)
+        If DatabaseHelper.AddUser(un, pw, fn, rid) Then
             DatabaseHelper.LogActivity(_currentUser.Username, _currentUser.Role, "Added new user: " & un)
             MessageBox.Show("User added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Me.DialogResult = DialogResult.OK

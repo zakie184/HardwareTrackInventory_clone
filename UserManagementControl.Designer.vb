@@ -6,6 +6,7 @@ Partial Class UserManagementControl
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.txtSearch = New System.Windows.Forms.TextBox()
         Me.lblTitle = New System.Windows.Forms.Label()
         Me.btnAddUser = New System.Windows.Forms.Button()
         Me.dgvUsers = New System.Windows.Forms.DataGridView()
@@ -14,7 +15,9 @@ Partial Class UserManagementControl
         Me.pnlTop.SuspendLayout()
         Me.SuspendLayout()
 
+        ' pnlTop
         Me.pnlTop.BackColor = System.Drawing.Color.FromArgb(26, 54, 75)
+        Me.pnlTop.Controls.Add(Me.txtSearch)
         Me.pnlTop.Controls.Add(Me.btnAddUser)
         Me.pnlTop.Controls.Add(Me.lblTitle)
         Me.pnlTop.Dock = System.Windows.Forms.DockStyle.Top
@@ -23,6 +26,16 @@ Partial Class UserManagementControl
         Me.pnlTop.Size = New System.Drawing.Size(800, 60)
         Me.pnlTop.TabIndex = 0
 
+        ' txtSearch
+        Me.txtSearch.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSearch.Font = New System.Drawing.Font("Segoe UI", 10.0!)
+        Me.txtSearch.Location = New System.Drawing.Point(410, 17)
+        Me.txtSearch.Name = "txtSearch"
+        Me.txtSearch.Size = New System.Drawing.Size(200, 25)
+        Me.txtSearch.TabIndex = 3
+        Me.txtSearch.Text = "Search user..."
+
+        ' lblTitle
         Me.lblTitle.AutoSize = True
         Me.lblTitle.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
         Me.lblTitle.ForeColor = System.Drawing.Color.White
@@ -32,18 +45,20 @@ Partial Class UserManagementControl
         Me.lblTitle.TabIndex = 0
         Me.lblTitle.Text = "User Management"
 
+        ' btnAddUser
         Me.btnAddUser.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnAddUser.BackColor = System.Drawing.Color.FromArgb(245, 176, 65)
         Me.btnAddUser.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnAddUser.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnAddUser.ForeColor = System.Drawing.Color.FromArgb(26, 54, 75)
-        Me.btnAddUser.Location = New System.Drawing.Point(650, 12)
+        Me.btnAddUser.Location = New System.Drawing.Point(630, 12)
         Me.btnAddUser.Name = "btnAddUser"
         Me.btnAddUser.Size = New System.Drawing.Size(130, 35)
         Me.btnAddUser.TabIndex = 1
         Me.btnAddUser.Text = "➕ Add New User"
         Me.btnAddUser.UseVisualStyleBackColor = False
 
+        ' dgvUsers
         Me.dgvUsers.AllowUserToAddRows = False
         Me.dgvUsers.AllowUserToDeleteRows = False
         Me.dgvUsers.BackgroundColor = System.Drawing.Color.White
@@ -58,6 +73,7 @@ Partial Class UserManagementControl
         Me.dgvUsers.Size = New System.Drawing.Size(800, 340)
         Me.dgvUsers.TabIndex = 1
 
+        ' UserManagementControl
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.dgvUsers)
@@ -75,4 +91,5 @@ Partial Class UserManagementControl
     Friend WithEvents lblTitle As System.Windows.Forms.Label
     Friend WithEvents btnAddUser As System.Windows.Forms.Button
     Friend WithEvents dgvUsers As System.Windows.Forms.DataGridView
+    Friend WithEvents txtSearch As System.Windows.Forms.TextBox
 End Class

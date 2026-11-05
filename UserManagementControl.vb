@@ -15,12 +15,32 @@
 
     Public Sub LoadUsers()
         Try
-            dgvUsers.DataSource = DatabaseHelper.GetAllUsers()
+            Dim searchQuery As String = txtSearch.Text.Trim()
+            If searchQuery = "Search user..." Then searchQuery = ""
+
+            dgvUsers.DataSource = DatabaseHelper.GetAllUsers(searchQuery)
             If dgvUsers.Columns.Contains("UserID") Then dgvUsers.Columns("UserID").Visible = False
             dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         Catch ex As Exception
-            MessageBox.Show("Error loading users: " & ex.Message)
         End Try
+    End Sub
+
+    Private Sub txtSearch_TextChanged(sender As Object, e As EventArgs) Handles txtSearch.TextChanged
+        LoadUsers()
+    End Sub
+
+    Private Sub txtSearch_Enter(sender As Object, e As EventArgs) Handles txtSearch.Enter
+        If txtSearch.Text = "Search user..." Then
+            txtSearch.Text = ""
+            txtSearch.ForeColor = Color.Black
+        End If
+    End Sub
+
+    Private Sub txtSearch_Leave(sender As Object, e As EventArgs) Handles txtSearch.Leave
+        If String.IsNullOrWhiteSpace(txtSearch.Text) Then
+            txtSearch.Text = "Search user..."
+            txtSearch.ForeColor = Color.Gray
+        End If
     End Sub
 
     Private Sub btnAddUser_Click(sender As Object, e As EventArgs) Handles btnAddUser.Click

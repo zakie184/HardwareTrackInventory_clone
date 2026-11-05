@@ -4,6 +4,7 @@ Public Class ReceivingForm
     Private _user As User = Nothing
     Private _preselectedItemID As Integer = 0
     Private isInitializing As Boolean = True
+    Private _hardwareList As DataTable = Nothing
 
     Public Sub New(user As User)
         InitializeComponent()
@@ -25,15 +26,16 @@ Public Class ReceivingForm
         End If
 
         isInitializing = True
+        txtSearchItem.ForeColor = Color.Gray
+        _hardwareList = DatabaseHelper.GetActiveHardware()
+
         SetupGrid()
         LoadSuppliers()
         LoadPendingRequests()
         LoadLowStockItems()
 
         If _preselectedItemID > 0 Then
-            Dim dt As DataTable = DatabaseHelper.GetActiveHardware()
-            ' FIX: FindRows fails on unsorted views. .Select() is safer and guaranteed.
-            Dim rows As DataRow() = dt.Select("HardwareID = " & _preselectedItemID)
+            Dim rows As DataRow() = _hardwareList.Select("HardwareID = " & _preselectedItemID)
             If rows.Length > 0 Then
                 Dim drv As DataRow = rows(0)
                 Dim newRowIndex As Integer = dgvItems.Rows.Add()
@@ -44,6 +46,46 @@ Public Class ReceivingForm
             End If
         End If
         isInitializing = False
+    End Sub
+
+    ' --- FIX: Suppress the ComboBox "Value is not valid" error ---
+    Private Sub dgvItems_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles dgvItems.DataError
+        e.ThrowException = False
+    End Sub
+
+    ' SEARCH BAR LOGIC
+    Private Sub txtSearchItem_TextChanged(sender As Object, e As EventArgs) Handles txtSearchItem.TextChanged
+        If _hardwareList Is Nothing Then Return
+
+        dgvItems.EndEdit() ' Commit any active edits before changing the list
+
+        Dim search As String = txtSearchItem.Text.Trim().Replace("'", "''")
+        Dim dv As New DataView(_hardwareList)
+
+        If search <> "" AndAlso search <> "Type to filter dropdown..." Then
+            dv.RowFilter = "Name LIKE '%" & search & "%' OR Category LIKE '%" & search & "%'"
+        End If
+
+        If dgvItems.Columns.Contains("ItemName") Then
+            Dim comboCol As DataGridViewComboBoxColumn = TryCast(dgvItems.Columns("ItemName"), DataGridViewComboBoxColumn)
+            If comboCol IsNot Nothing Then
+                comboCol.DataSource = dv
+            End If
+        End If
+    End Sub
+
+    Private Sub txtSearchItem_Enter(sender As Object, e As EventArgs) Handles txtSearchItem.Enter
+        If txtSearchItem.Text = "Type to filter dropdown..." Then
+            txtSearchItem.Text = ""
+            txtSearchItem.ForeColor = Color.Black
+        End If
+    End Sub
+
+    Private Sub txtSearchItem_Leave(sender As Object, e As EventArgs) Handles txtSearchItem.Leave
+        If String.IsNullOrWhiteSpace(txtSearchItem.Text) Then
+            txtSearchItem.Text = "Type to filter dropdown..."
+            txtSearchItem.ForeColor = Color.Gray
+        End If
     End Sub
 
     Private Sub LoadLowStockItems()
@@ -67,7 +109,6 @@ Public Class ReceivingForm
 
     Private Sub LoadPendingRequests()
         Dim dt As DataTable = DatabaseHelper.GetPendingReceivings()
-
         Dim dr As DataRow = dt.NewRow()
         dr("ReceivingID") = 0
         dr("Supplier") = "None (Create New Request)"
@@ -86,7 +127,6 @@ Public Class ReceivingForm
             If drv IsNot Nothing Then
                 Dim id As Integer = Convert.ToInt32(drv("ReceivingID"))
                 Dim supID As Integer = Convert.ToInt32(drv("SupplierID"))
-
                 cmbSupplier.SelectedValue = supID
                 cmbSupplier.Enabled = False
 
@@ -109,11 +149,12 @@ Public Class ReceivingForm
     Private Sub SetupGrid()
         dgvItems.AutoGenerateColumns = False
         dgvItems.AllowUserToAddRows = True
+        dgvItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect
 
         Dim colItem As New DataGridViewComboBoxColumn()
         colItem.HeaderText = "Item Name"
         colItem.Name = "ItemName"
-        colItem.DataSource = DatabaseHelper.GetActiveHardware()
+        colItem.DataSource = _hardwareList
         colItem.DisplayMember = "Name"
         colItem.ValueMember = "HardwareID"
         colItem.FlatStyle = FlatStyle.Flat
@@ -146,6 +187,10 @@ Public Class ReceivingForm
         If dgvItems.CurrentCell.ColumnIndex = 0 Then
             Dim combo As ComboBox = TryCast(e.Control, ComboBox)
             If combo IsNot Nothing Then
+                combo.DropDownStyle = ComboBoxStyle.DropDown
+                combo.AutoCompleteMode = AutoCompleteMode.SuggestAppend
+                combo.AutoCompleteSource = AutoCompleteSource.ListItems
+
                 RemoveHandler combo.SelectedIndexChanged, AddressOf Combo_SelectedIndexChanged
                 AddHandler combo.SelectedIndexChanged, AddressOf Combo_SelectedIndexChanged
             End If
@@ -168,10 +213,12 @@ Public Class ReceivingForm
     End Sub
 
     Private Sub btnRemoveItem_Click(sender As Object, e As EventArgs) Handles btnRemoveItem.Click
-        If dgvItems.SelectedRows.Count > 0 Then
-            For Each row As DataGridViewRow In dgvItems.SelectedRows
-                If Not row.IsNewRow Then dgvItems.Rows.Remove(row)
-            Next
+        For i As Integer = dgvItems.SelectedRows.Count - 1 To 0 Step -1
+            Dim row As DataGridViewRow = dgvItems.SelectedRows(i)
+            If Not row.IsNewRow Then dgvItems.Rows.Remove(row)
+        Next
+        If dgvItems.SelectedRows.Count = 0 AndAlso dgvItems.CurrentRow IsNot Nothing Then
+            If Not dgvItems.CurrentRow.IsNewRow Then dgvItems.Rows.Remove(dgvItems.CurrentRow)
         End If
     End Sub
 
@@ -182,15 +229,23 @@ Public Class ReceivingForm
         End If
 
         Dim lines As New List(Of ReceivingLine)
+        Dim processedIDs As New HashSet(Of Integer)()
+
         For Each row As DataGridViewRow In dgvItems.Rows
             If row.IsNewRow Then Continue For
-            ' FIX: Added DBNull safety check before parsing
             If row.Cells("ItemName").Value IsNot Nothing AndAlso Not IsDBNull(row.Cells("ItemName").Value) AndAlso row.Cells("Qty").Value IsNot Nothing Then
                 Dim hid As Integer = 0
                 Dim qty As Integer = 0
                 Integer.TryParse(row.Cells("ItemName").Value.ToString(), hid)
                 Integer.TryParse(row.Cells("Qty").Value.ToString(), qty)
+
                 If hid > 0 AndAlso qty > 0 Then
+                    If processedIDs.Contains(hid) Then
+                        MessageBox.Show("Duplicate item detected. Please combine the quantities into a single row.", "Duplicate Item", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Return
+                    End If
+
+                    processedIDs.Add(hid)
                     lines.Add(New ReceivingLine With {.HardwareID = hid, .Quantity = qty})
                 End If
             End If
@@ -202,9 +257,8 @@ Public Class ReceivingForm
         End If
 
         Dim supID As Integer = Convert.ToInt32(cmbSupplier.SelectedValue)
-        Dim branchID As Integer = _user.BranchID.GetValueOrDefault(1)
 
-        If DatabaseHelper.CreateReceivingRequest(supID, branchID, _user.Username, lines) Then
+        If DatabaseHelper.CreateReceivingRequest(supID, _user.Username, lines) Then
             MessageBox.Show("Request submitted! Waiting for Admin approval.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Me.DialogResult = DialogResult.OK
             Me.Close()

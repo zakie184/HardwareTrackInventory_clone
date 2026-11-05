@@ -4,8 +4,6 @@
     Public Property FullName As String
     Public Property Role As String
     Public Property Status As String = "Active"
-    Public Property BranchID As Integer?
-    Public Property BranchName As String
 
     Public ReadOnly Property RoleDisplay As String
         Get
@@ -18,29 +16,31 @@
         End Get
     End Property
 
-    Public ReadOnly Property BranchDisplay As String
-        Get
-            If BranchName IsNot Nothing Then Return BranchName
-            Return "All Branches"
-        End Get
-    End Property
-
-    ' RETAIL SYSTEM PERMISSIONS
+    ' PERMISSIONS
     Public Function CanManageUsers() As Boolean
         Return Role = "Administrator"
     End Function
-    Public Function CanApprove() As Boolean
+
+    Public Function CanApproveReceivingsAndReturns() As Boolean
         Return Role = "Administrator"
     End Function
+
+    Public Function CanApproveIssuances() As Boolean
+        Return Role = "Administrator" OrElse Role = "Inventory Manager"
+    End Function
+
     Public Function CanManageMasterList() As Boolean
         Return Role = "Administrator" OrElse Role = "Inventory Manager"
     End Function
+
     Public Function CanToggleStatus() As Boolean
         Return Role = "Administrator"
     End Function
+
     Public Function CanReceive() As Boolean
         Return Role = "Administrator" OrElse Role = "Inventory Manager"
     End Function
+
     Public Function CanIssue() As Boolean
         Return Role = "Administrator" OrElse Role = "Inventory Manager" OrElse Role = "Staff"
     End Function

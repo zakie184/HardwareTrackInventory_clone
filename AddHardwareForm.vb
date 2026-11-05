@@ -14,16 +14,11 @@
             Return
         End If
 
-        cmbCategory.Items.AddRange(New String() {"Laptop", "Desktop", "Monitor", "Peripheral", "Printer", "Network"})
-
-        Dim dtBranches As DataTable = DatabaseHelper.GetAllBranches()
-        cmbBranch.DataSource = dtBranches
-        cmbBranch.DisplayMember = "Name"
-        cmbBranch.ValueMember = "BranchID"
-
-        If _currentUser.BranchID.HasValue Then
-            cmbBranch.SelectedValue = _currentUser.BranchID.Value
-        End If
+        ' FIX: Passed an empty string "" to fetch all categories for the dropdown
+        Dim dtCategories As DataTable = DatabaseHelper.GetAllCategories("")
+        cmbCategory.DataSource = dtCategories
+        cmbCategory.DisplayMember = "CategoryName"
+        cmbCategory.ValueMember = "CategoryName"
     End Sub
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
@@ -32,23 +27,17 @@
             Return
         End If
 
-        If cmbBranch.SelectedIndex < 0 Then
-            MessageBox.Show("Please select a Branch.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
-
         Dim itemName As String = txtName.Text.Trim()
         Dim itemCategory As String = cmbCategory.Text.Trim()
-        Dim branchID As Integer = Convert.ToInt32(cmbBranch.SelectedValue)
         Dim initialQty As Integer = CInt(numQty.Value)
 
-        If DatabaseHelper.AddHardwareWithStock(itemName, itemCategory, branchID, initialQty) Then
+        If DatabaseHelper.AddHardwareWithStock(itemName, itemCategory, initialQty) Then
             DatabaseHelper.LogActivity(_currentUser.Username, _currentUser.Role, "Added new hardware: " & itemName)
             MessageBox.Show("Hardware added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Me.DialogResult = DialogResult.OK
             Me.Close()
         Else
-            MessageBox.Show("Failed to add hardware. Item might already exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Failed to add hardware. This item name already exists in the master list.", "Duplicate Item", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
 
